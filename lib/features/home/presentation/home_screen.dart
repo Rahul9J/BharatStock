@@ -8,6 +8,7 @@ import 'package:bharatstock/l10n/app_localizations.dart';
 import 'package:bharatstock/core/services/firestore_service.dart';
 import 'package:bharatstock/features/home/presentation/widgets/home_drawer.dart';
 import 'package:bharatstock/features/home/presentation/widgets/dashboard_card.dart';
+import 'package:bharatstock/core/widgets/responsive_layout.dart';
 
 // Import Screens from features
 import 'package:bharatstock/features/staff/presentation/staff_list_screen.dart';
@@ -32,6 +33,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  int _desktopSelectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +41,14 @@ class _HomeScreenState extends State<HomeScreen> {
     const baseColor = Color(0xFFF2F4F8);
     final user = FirebaseAuth.instance.currentUser;
 
+    return ResponsiveLayout(
+      mobileBody: _buildMobileScaffold(context, l, baseColor, user),
+      desktopBody: _buildDesktopScaffold(context, l, baseColor, user),
+    );
+  }
+
+  Widget _buildMobileScaffold(
+      BuildContext context, AppLocalizations l, Color baseColor, User? user) {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: baseColor,
@@ -83,9 +93,156 @@ class _HomeScreenState extends State<HomeScreen> {
         child: const Icon(Icons.receipt_long, size: 30, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      body: user == null
-          ? const Center(child: Text("Please Login"))
-          : StreamBuilder<DocumentSnapshot>(
+      body: _buildHomeBody(context, l, baseColor, user),
+    );
+  }
+
+  Widget _buildDesktopScaffold(
+      BuildContext context, AppLocalizations l, Color baseColor, User? user) {
+    return Scaffold(
+      backgroundColor: baseColor,
+      body: Row(
+        children: [
+          // CLAY SIDEBAR
+          _buildDesktopSidebar(context, l, baseColor),
+          Expanded(
+            child: Column(
+              children: [
+                // TOP BAR
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+                  color: baseColor,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l.hello,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A1A2E),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          _buildDesktopIconButton(Icons.notifications_outlined),
+                          const SizedBox(width: 15),
+                          _buildDesktopIconButton(Icons.settings_outlined),
+                          const SizedBox(width: 15),
+                          const CircleAvatar(
+                            backgroundColor: Color(0xFFFF9800),
+                            child: Icon(Icons.person, color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: _buildHomeBody(context, l, baseColor, user, isDesktop: true),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDesktopSidebar(
+      BuildContext context, AppLocalizations l, Color baseColor) {
+    return Container(
+      width: 250,
+      margin: const EdgeInsets.all(15),
+      child: ClayContainer(
+        color: baseColor,
+        borderRadius: 20,
+        depth: 15,
+        child: Column(
+          children: [
+            const SizedBox(height: 30),
+            // APP LOGO
+            const Icon(Icons.shopping_bag_rounded,
+                size: 50, color: Color(0xFFFF9800)),
+            const Text(
+              "BharatStock",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1A1A2E),
+              ),
+            ),
+            const SizedBox(height: 40),
+            _buildSidebarItem(0, Icons.dashboard_outlined, "Dashboard"),
+            _buildSidebarItem(1, Icons.receipt_long_outlined, "Bills"),
+            _buildSidebarItem(2, Icons.people_outline, "Parties"),
+            _buildSidebarItem(3, Icons.inventory_2_outlined, "Inventory"),
+            _buildSidebarItem(4, Icons.insights_outlined, "Analytics"),
+            const Spacer(),
+            _buildSidebarItem(-1, Icons.logout_rounded, "Logout", onTap: () {
+              FirebaseAuth.instance.signOut();
+            }),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSidebarItem(int index, IconData icon, String title,
+      {VoidCallback? onTap}) {
+    final isSelected = _desktopSelectedIndex == index;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+      child: GestureDetector(
+        onTap: onTap ?? () => setState(() => _desktopSelectedIndex = index),
+        child: ClayContainer(
+          color: const Color(0xFFF2F4F8),
+          borderRadius: 12,
+          depth: isSelected ? -10 : 5,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+            child: Row(
+              children: [
+                Icon(icon,
+                    color: isSelected ? const Color(0xFFFF9800) : Colors.grey,
+                    size: 22),
+                const SizedBox(width: 15),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
+                    color: isSelected ? const Color(0xFF1A1A2E) : Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDesktopIconButton(IconData icon) {
+    return ClayContainer(
+      color: const Color(0xFFF2F4F8),
+      borderRadius: 12,
+      depth: 10,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Icon(icon, size: 20, color: Colors.grey[700]),
+      ),
+    );
+  }
+
+  Widget _buildHomeBody(
+      BuildContext context, AppLocalizations l, Color baseColor, User? user,
+      {bool isDesktop = false}) {
+    return user == null
+        ? const Center(child: Text("Please Login"))
+        : StreamBuilder<DocumentSnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('users')
                   .doc(user.uid)
@@ -259,14 +416,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 15),
 
-                      GridView.count(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 15,
-                        mainAxisSpacing: 15,
-                        childAspectRatio: 0.85,
-                        children: [
+                      LayoutBuilder(builder: (context, constraints) {
+                        final width = constraints.maxWidth;
+                        final crossAxisCount = isDesktop ? (width > 1400 ? 4 : (width > 900 ? 3 : 2)) : 2;
+                        
+                        return GridView.count(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: crossAxisCount,
+                          crossAxisSpacing: 15,
+                          mainAxisSpacing: 15,
+                          childAspectRatio: 0.85,
+                          children: [
                           DashboardCard(
                             title: l.waitersStaff,
                             subtitle: l.viewWorkers,
@@ -447,7 +608,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                           ),
                         ],
-                      ),
+                      );
+                    }),
 
                       // 4. RECENT TRANSACTIONS
                       const SizedBox(height: 25),

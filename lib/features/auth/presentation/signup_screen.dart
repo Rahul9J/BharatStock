@@ -103,8 +103,11 @@ class _SignupScreenState extends State<SignupScreen> {
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-          child: Column(
-            children: [
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 500),
+              child: Column(
+                children: [
               ClayContainer(
                 color: baseColor,
                 borderRadius: 20,
@@ -212,7 +215,9 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
               ),
-            ],
+                ],
+              ),
+            ),
           ),
         ),
       ),
