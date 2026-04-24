@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "146484979321",
+    "project_id": "bharatstock-v6-1303",
+    "storage_bucket": "bharatstock-v6-1303.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:146484979321:android:201b36374dd29950f816a8",
+        "android_client_info": {
+          "package_name": "com.example.bharatstock"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoRenIoE4r91FKkEaWL9NDMlw--LRH0Tc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

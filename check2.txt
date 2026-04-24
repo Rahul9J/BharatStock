@@ -1,0 +1,14 @@
+﻿Analyzing bharatstock...
+
+  error - lib\features\language\language_screen.dart:4:8 - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart'. Try creating the file referenced by the URI, or try using a URI for a file that does exist. - uri_does_not_exist
+  error - lib\main.dart:3:8 - Target of URI doesn't exist: 'firebase_options.dart'. Try creating the file referenced by the URI, or try using a URI for a file that does exist. - uri_does_not_exist
+  error - lib\main.dart:6:8 - Target of URI doesn't exist: 'package:flutter_gen/gen_l10n/app_localizations.dart'. Try creating the file referenced by the URI, or try using a URI for a file that does exist. - uri_does_not_exist
+  error - lib\main.dart:8:8 - Target of URI doesn't exist: 'core/theme/font_size_provider.dart'. Try creating the file referenced by the URI, or try using a URI for a file that does exist. - uri_does_not_exist
+  error - lib\main.dart:15:41 - Undefined name 'DefaultFirebaseOptions'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\main.dart:16:9 - Undefined name 'FontSizeProvider'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\main.dart:27:24 - Undefined name 'FontSizeProvider'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\main.dart:38:17 - The values in a const list literal must be constants. Try removing the keyword 'const' from the list literal. - non_constant_list_element
+  error - lib\main.dart:38:17 - Undefined name 'AppLocalizations'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+   info - lib\core\providers\language_provider.dart:1:8 - The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+
+10 issues found.
