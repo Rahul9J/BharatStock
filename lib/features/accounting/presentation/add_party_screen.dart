@@ -324,31 +324,34 @@ class _AddPartyScreenState extends State<AddPartyScreen> {
                       ),
                     ),
 
-                  // Type Selection (Simplified for view)
-                  SegmentedButton<String>(
-                    segments: const [
-                      ButtonSegment(
-                        value: 'customer',
-                        label: Text('Customer'),
-                        icon: Icon(Icons.person),
+                  // Type Selection
+                  SizedBox(
+                    width: double.infinity,
+                    child: SegmentedButton<String>(
+                      segments: const [
+                        ButtonSegment(
+                          value: 'customer',
+                          label: Text('Customer', overflow: TextOverflow.ellipsis),
+                          icon: Icon(Icons.person, size: 18),
+                        ),
+                        ButtonSegment(
+                          value: 'supplier',
+                          label: Text('Supplier', overflow: TextOverflow.ellipsis),
+                          icon: Icon(Icons.local_shipping, size: 18),
+                        ),
+                      ],
+                      selected: {_selectedType},
+                      onSelectionChanged: (Set<String> newSelection) {
+                        setState(() => _selectedType = newSelection.first);
+                      },
+                      style: SegmentedButton.styleFrom(
+                        selectedBackgroundColor: _selectedType == 'customer'
+                            ? Colors.green.withValues(alpha: 0.2)
+                            : Colors.red.withValues(alpha: 0.2),
+                        selectedForegroundColor: _selectedType == 'customer'
+                            ? Colors.green
+                            : Colors.red,
                       ),
-                      ButtonSegment(
-                        value: 'supplier',
-                        label: Text('Supplier'),
-                        icon: Icon(Icons.local_shipping),
-                      ),
-                    ],
-                    selected: {_selectedType},
-                    onSelectionChanged: (Set<String> newSelection) {
-                      setState(() => _selectedType = newSelection.first);
-                    },
-                    style: SegmentedButton.styleFrom(
-                      selectedBackgroundColor: _selectedType == 'customer'
-                          ? Colors.green.withValues(alpha: 0.2)
-                          : Colors.red.withValues(alpha: 0.2),
-                      selectedForegroundColor: _selectedType == 'customer'
-                          ? Colors.green
-                          : Colors.red,
                     ),
                   ),
                   const SizedBox(height: 15),
@@ -374,19 +377,26 @@ class _AddPartyScreenState extends State<AddPartyScreen> {
                   const SizedBox(height: 25),
 
                   _buildSectionTitle("GST & Address"),
-                  SegmentedButton<String>(
-                    segments: const [
-                      ButtonSegment(
-                        value: 'unregistered',
-                        label: Text('Unreg'),
+                  // GST Registration Type Dropdown (safer than SegmentedButton for 3 options)
+                  ClayCard(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    borderRadius: 12,
+                    depth: 6,
+                    child: DropdownButtonFormField<String>(
+                      value: _registrationType,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        icon: Icon(Icons.receipt_long, color: Colors.grey, size: 20),
+                        labelText: 'GST Registration Type',
+                        labelStyle: TextStyle(fontSize: 12),
                       ),
-                      ButtonSegment(value: 'regular', label: Text('Regular')),
-                      ButtonSegment(value: 'composition', label: Text('Comp')),
-                    ],
-                    selected: {_registrationType},
-                    onSelectionChanged: (Set<String> newSelection) {
-                      setState(() => _registrationType = newSelection.first);
-                    },
+                      items: const [
+                        DropdownMenuItem(value: 'unregistered', child: Text('Unregistered', style: TextStyle(fontSize: 14))),
+                        DropdownMenuItem(value: 'regular', child: Text('Regular (GST Registered)', style: TextStyle(fontSize: 14))),
+                        DropdownMenuItem(value: 'composition', child: Text('Composition Scheme', style: TextStyle(fontSize: 14))),
+                      ],
+                      onChanged: (v) => setState(() => _registrationType = v!),
+                    ),
                   ),
                   const SizedBox(height: 15),
                   if (_registrationType != 'unregistered')
@@ -478,6 +488,7 @@ class _AddPartyScreenState extends State<AddPartyScreen> {
         Row(
           children: [
             Expanded(
+              flex: 3,
               child: ClayInput(
                 controller: city,
                 hint: "City",
@@ -486,10 +497,10 @@ class _AddPartyScreenState extends State<AddPartyScreen> {
             ),
             const SizedBox(width: 10),
             Expanded(
+              flex: 2,
               child: ClayInput(
                 controller: pincode,
                 hint: "Pincode",
-                icon: Icons.pin_drop,
                 isNumeric: true,
               ),
             ),

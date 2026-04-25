@@ -40,7 +40,7 @@ class ClayCard extends StatelessWidget {
   }
 }
 
-class ClayTextField extends StatelessWidget {
+class ClayTextField extends StatefulWidget {
   final TextEditingController? controller;
   final String? placeholder;
   final String? hint;
@@ -71,6 +71,19 @@ class ClayTextField extends StatelessWidget {
   });
 
   @override
+  State<ClayTextField> createState() => _ClayTextFieldState();
+}
+
+class _ClayTextFieldState extends State<ClayTextField> {
+  late bool _obscureText;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscureText = widget.isPassword;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ClayContainer(
       depth: -10,
@@ -79,21 +92,33 @@ class ClayTextField extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: TextFormField(
-          controller: controller,
-          keyboardType:
-              keyboardType ?? (isNumeric ? TextInputType.number : null),
-          validator: validator,
-          onChanged: onChanged,
-          obscureText: isPassword,
-          textCapitalization: textCapitalization,
-          onTap: onTap,
-          readOnly: readOnly,
+          controller: widget.controller,
+          keyboardType: widget.keyboardType ??
+              (widget.isNumeric ? TextInputType.number : null),
+          validator: widget.validator,
+          onChanged: widget.onChanged,
+          obscureText: _obscureText,
+          textCapitalization: widget.textCapitalization,
+          onTap: widget.onTap,
+          readOnly: widget.readOnly,
           decoration: InputDecoration(
             border: InputBorder.none,
-            hintText: placeholder ?? hint,
+            hintText: widget.placeholder ?? widget.hint,
             hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-            prefixIcon: icon != null
-                ? Icon(icon, size: 20, color: Colors.grey)
+            prefixIcon: widget.icon != null
+                ? Icon(widget.icon, size: 20, color: Colors.grey)
+                : null,
+            suffixIcon: widget.isPassword
+                ? GestureDetector(
+                    onTap: () => setState(() => _obscureText = !_obscureText),
+                    child: Icon(
+                      _obscureText
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      size: 20,
+                      color: Colors.grey,
+                    ),
+                  )
                 : null,
           ),
         ),

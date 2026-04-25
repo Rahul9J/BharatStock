@@ -606,6 +606,8 @@ class _ProfitLossScreenState extends State<ProfitLossScreen> {
 
   IconData _getExpenseIcon(String category) {
     switch (category.toLowerCase()) {
+      case 'stock purchase':
+        return Icons.inventory_2;
       case 'salary':
         return Icons.people;
       case 'rent':
@@ -623,6 +625,8 @@ class _ProfitLossScreenState extends State<ProfitLossScreen> {
 
   Color _getExpenseColor(String category) {
     switch (category.toLowerCase()) {
+      case 'stock purchase':
+        return Colors.green[700]!;
       case 'salary':
         return Colors.purple;
       case 'rent':

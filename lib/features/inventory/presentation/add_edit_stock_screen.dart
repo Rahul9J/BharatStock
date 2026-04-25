@@ -8,6 +8,7 @@ import '../../auth/logic/user_service.dart';
 import '../../accounting/data/party_model.dart';
 import '../../../core/utils/tax_calculator.dart';
 import '../data/stock_model.dart';
+import '../../analytics/data/expense_model.dart';
 
 class AddEditStockScreen extends StatefulWidget {
   final StockModel? stock;
@@ -166,6 +167,28 @@ class _AddEditStockScreenState extends State<AddEditStockScreen> {
           itcAmount: itcAmount,
           isVerifiedGstr2b: _isVerifiedGstr2b,
         );
+
+        // Auto-log purchase as an expense so it shows in Expenses & P&L
+        if (costPrice > 0) {
+          final totalPurchaseCost = purchaseTaxable + itcAmount;
+          final supplierName = _selectedSupplier?.name ?? '';
+          final invoiceNo = _supplierInvoiceController.text.trim();
+
+          final expenseTitle = supplierName.isNotEmpty
+              ? 'Stock Purchase: $name (from $supplierName)'
+              : 'Stock Purchase: $name${invoiceNo.isNotEmpty ? ' | Inv# $invoiceNo' : ''}';
+
+          await _service.addExpense(
+            ExpenseModel(
+              id: '',
+              title: expenseTitle,
+              amount: totalPurchaseCost,
+              date: _invoiceDate ?? DateTime.now(),
+              category: 'Stock Purchase',
+              type: 'one-time',
+            ),
+          );
+        }
       } else {
         await _service.updateStock(widget.stock!.id, {
           'name': name,

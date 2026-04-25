@@ -397,7 +397,12 @@ class _Gstr1ReportScreenState extends State<Gstr1ReportScreen>
       padding: const EdgeInsets.all(16),
       children: [
         ClayCard(
-          color: Colors.orange.withValues(alpha: 0.05),
+          color: const Color.fromARGB(
+            255,
+            247,
+            242,
+            242,
+          ).withValues(alpha: 0.05),
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
@@ -405,7 +410,7 @@ class _Gstr1ReportScreenState extends State<Gstr1ReportScreen>
                 "B2C AGGREGATE",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.deepOrange,
+                  color: Color.fromARGB(255, 11, 0, 0),
                   letterSpacing: 1.2,
                   fontSize: 12,
                 ),

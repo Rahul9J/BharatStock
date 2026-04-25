@@ -19,6 +19,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   String _selectedCategory = 'All';
   final List<String> _categories = [
     'All',
+    'Stock Purchase',
     'Rent',
     'Salary',
     'Electricity',
@@ -316,6 +317,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   IconData _getCategoryIcon(String category) {
     switch (category.toLowerCase()) {
+      case 'stock purchase':
+        return Icons.inventory_2;
       case 'salary':
         return Icons.people;
       case 'rent':
@@ -337,6 +340,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   Color _getCategoryColor(String category) {
     switch (category.toLowerCase()) {
+      case 'stock purchase':
+        return Colors.green[700]!;
       case 'salary':
         return Colors.purple;
       case 'rent':

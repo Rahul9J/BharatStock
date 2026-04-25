@@ -126,7 +126,9 @@ class AuthWrapper extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, authSnap) {
-        debugPrint("Auth State: ${authSnap.connectionState}, User: ${authSnap.data?.uid}");
+        debugPrint(
+          "Auth State: ${authSnap.connectionState}, User: ${authSnap.data?.uid}",
+        );
         if (authSnap.connectionState == ConnectionState.waiting) {
           return const _LoadingScreen();
         }
@@ -157,8 +159,10 @@ class InitialRouter extends StatelessWidget {
           .doc(user.uid)
           .get(),
       builder: (context, snapshot) {
-        debugPrint("InitialRouter State: ${snapshot.connectionState}, HasData: ${snapshot.hasData}, Error: ${snapshot.error}");
-        
+        debugPrint(
+          "InitialRouter State: ${snapshot.connectionState}, HasData: ${snapshot.hasData}, Error: ${snapshot.error}",
+        );
+
         if (snapshot.hasError) {
           return Scaffold(
             body: Center(
