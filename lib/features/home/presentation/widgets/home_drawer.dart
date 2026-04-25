@@ -6,6 +6,7 @@ import 'package:bharatstock/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bharatstock/core/providers/language_provider.dart';
 import 'package:bharatstock/core/theme/font_size_provider.dart';
+import 'package:bharatstock/features/auth/presentation/complete_profile_screen.dart';
 
 class HomeDrawer extends StatelessWidget {
   const HomeDrawer({super.key});
@@ -30,6 +31,20 @@ class HomeDrawer extends StatelessWidget {
                   title: l.dashboard,
                   onTap: () => Navigator.pop(context),
                   selected: true,
+                ),
+                _buildMenuItem(
+                  context,
+                  icon: Icons.manage_accounts_rounded,
+                  title: 'Edit Profile',
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CompleteProfileScreen(),
+                      ),
+                    );
+                  },
                 ),
                 _buildMenuItem(
                   context,
@@ -138,72 +153,94 @@ class HomeDrawer extends StatelessWidget {
           }
         }
 
-        return Container(
-          padding: const EdgeInsets.only(
-            top: 50,
-            left: 20,
-            right: 20,
-            bottom: 20,
-          ),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                theme.primaryColor,
-                theme.primaryColor.withValues(alpha: 0.8),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+        return GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const CompleteProfileScreen(),
+              ),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.only(
+              top: 50,
+              left: 20,
+              right: 20,
+              bottom: 20,
             ),
-          ),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: Colors.white24,
-                backgroundImage: userImageUrl != null
-                    ? (userImageUrl.startsWith('data:image')
-                          ? MemoryImage(
-                              base64Decode(userImageUrl.split(',').last),
-                            )
-                          : NetworkImage(userImageUrl) as ImageProvider)
-                    : null,
-                child: userImageUrl == null
-                    ? Text(
-                        name[0].toUpperCase(),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  theme.primaryColor,
+                  theme.primaryColor.withValues(alpha: 0.8),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Colors.white24,
+                  backgroundImage: userImageUrl != null
+                      ? (userImageUrl.startsWith('data:image')
+                            ? MemoryImage(
+                                base64Decode(userImageUrl.split(',').last),
+                              )
+                            : NetworkImage(userImageUrl) as ImageProvider)
+                      : null,
+                  child: userImageUrl == null
+                      ? Text(
+                          name[0].toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      : null,
+                ),
+                const SizedBox(width: 15),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 24,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
-                      )
-                    : null,
-              ),
-              const SizedBox(width: 15),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
                       ),
-                    ),
-                    Text(
-                      businessName,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
+                      Text(
+                        businessName,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                      const SizedBox(height: 4),
+                      const Row(
+                        children: [
+                          Icon(Icons.edit, size: 11, color: Colors.white60),
+                          SizedBox(width: 4),
+                          Text(
+                            'Tap to edit profile',
+                            style: TextStyle(color: Colors.white60, fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

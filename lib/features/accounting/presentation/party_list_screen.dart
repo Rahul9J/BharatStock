@@ -61,11 +61,25 @@ class PartyListScreen extends StatelessWidget {
   }
 }
 
-class _PartyList extends StatelessWidget {
+class _PartyList extends StatefulWidget {
   final FirestoreService service;
   final String type;
 
   const _PartyList({required this.service, required this.type});
+
+  @override
+  State<_PartyList> createState() => _PartyListState();
+}
+
+class _PartyListState extends State<_PartyList> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,16 +88,17 @@ class _PartyList extends StatelessWidget {
       child: Column(
         children: [
           ClayInput(
-            hint: "Search ${type}s...",
+            hint: "Search ${widget.type}s...",
             icon: Icons.search,
+            controller: _searchController,
             onChanged: (val) {
-              // NOTE: Implement local filtering if needed in future versions.
+              setState(() => _searchQuery = val.trim().toLowerCase());
             },
           ),
           const SizedBox(height: 20),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: service.getPartiesStream(type: type),
+              stream: widget.service.getPartiesStream(type: widget.type),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -105,7 +120,7 @@ class _PartyList extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          "No ${type}s found",
+                          "No ${widget.type}s found",
                           style: TextStyle(
                             color: Colors.grey.shade600,
                             fontSize: 16,
@@ -116,12 +131,34 @@ class _PartyList extends StatelessWidget {
                   );
                 }
 
-                final docs = snapshot.data!.docs;
+                // Apply search filter by name, mobile, or city
+                final docs = snapshot.data!.docs.where((doc) {
+                  if (_searchQuery.isEmpty) return true;
+                  final party = PartyModel.fromSnapshot(doc);
+                  return party.name.toLowerCase().contains(_searchQuery) ||
+                      party.mobile.toLowerCase().contains(_searchQuery) ||
+                      party.billingCity.toLowerCase().contains(_searchQuery);
+                }).toList();
+
+                if (docs.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.search_off, size: 64, color: Colors.grey.shade400),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No results for "$_searchQuery"',
+                          style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  );
+                }
 
                 return ListView.separated(
                   itemCount: docs.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 15),
+                  separatorBuilder: (context, index) => const SizedBox(height: 15),
                   itemBuilder: (context, index) {
                     final party = PartyModel.fromSnapshot(docs[index]);
                     final isCustomer = party.type == 'customer';

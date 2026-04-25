@@ -5,8 +5,22 @@ import '../../../core/widgets/clay_widgets.dart';
 import '../data/stock_model.dart';
 import 'add_edit_stock_screen.dart';
 
-class StockScreen extends StatelessWidget {
+class StockScreen extends StatefulWidget {
   const StockScreen({super.key});
+
+  @override
+  State<StockScreen> createState() => _StockScreenState();
+}
+
+class _StockScreenState extends State<StockScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,17 +54,18 @@ class StockScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            // Search Bar
+            // Search Bar — now wired to state
             ClayInput(
               hint: "Search products...",
               icon: Icons.search,
+              controller: _searchController,
               onChanged: (v) {
-                // Filter logic can be added here if needed
+                setState(() => _searchQuery = v.trim().toLowerCase());
               },
             ),
             const SizedBox(height: 20),
 
-            // REAL-TIME LIST
+            // REAL-TIME LIST with local filter
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
                 stream: service.getStocksStream(),
@@ -69,7 +84,29 @@ class StockScreen extends StatelessWidget {
                     );
                   }
 
-                  final docs = snapshot.data!.docs;
+                  // Apply search filter
+                  final docs = snapshot.data!.docs.where((doc) {
+                    if (_searchQuery.isEmpty) return true;
+                    final stock = StockModel.fromSnapshot(doc);
+                    return stock.name.toLowerCase().contains(_searchQuery) ||
+                        stock.category.toLowerCase().contains(_searchQuery);
+                  }).toList();
+
+                  if (docs.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.search_off, size: 64, color: Colors.grey.shade400),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No results for "$_searchQuery"',
+                            style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
 
                   return ListView.separated(
                     itemCount: docs.length,
@@ -104,9 +141,7 @@ class StockScreen extends StatelessWidget {
                             ),
                             title: Text(
                               stock.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             subtitle: Text("Cat: ${stock.category}"),
                             trailing: Column(
@@ -123,8 +158,7 @@ class StockScreen extends StatelessWidget {
                                 Text(
                                   "Qty: ${stock.quantity.toStringAsFixed(0)}",
                                   style: TextStyle(
-                                    color:
-                                        stock.quantity < (stock.lowStockNotify)
+                                    color: stock.quantity < (stock.lowStockNotify)
                                         ? Colors.red
                                         : Colors.green,
                                     fontWeight: FontWeight.bold,
